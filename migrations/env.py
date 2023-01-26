@@ -1,5 +1,7 @@
 # alembic revision --autogenerate -m "название коммита"
-# команда для миграций
+# команда для создания миграций
+# alembic upgrade head
+# для выполнения миграций
 
 from logging.config import fileConfig
 
