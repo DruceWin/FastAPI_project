@@ -1,0 +1,25 @@
+version: '3.9'
+services:
+  db:
+    container_name: pg_container
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: my_db
+    volumes:
+      - ./postgres_data/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+#    environment:
+#      - .env
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
