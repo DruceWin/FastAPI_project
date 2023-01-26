@@ -12,6 +12,7 @@ from config import DB_USER, DB_PASS, DB_HOST, DB_NAME, DB_PORT
 config = context.config
 
 section = config.config_ini_section
+
 config.set_section_option(section, "DB_HOST", DB_HOST)
 config.set_section_option(section, "DB_PORT", DB_PORT)
 config.set_section_option(section, "DB_USER", DB_USER)
