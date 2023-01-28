@@ -15,3 +15,12 @@ class User(BaseModel):
     surname: str
     # role_id: int
     role_id: Role
+
+
+class UserIn(BaseModel):
+    email: str
+    username: str
+    password: str
+    name: str
+    surname: str
+    role_id: int
