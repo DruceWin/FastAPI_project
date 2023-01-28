@@ -13,4 +13,5 @@ class User(BaseModel):
     password: str
     name: str
     surname: str
-    role_id: int
+    # role_id: int
+    role_id: Role
