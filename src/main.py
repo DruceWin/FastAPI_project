@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from auth.router import auth_router
-from auth.database import database
+from database import database
 
 app = FastAPI(title='auth')
 app.include_router(auth_router)
