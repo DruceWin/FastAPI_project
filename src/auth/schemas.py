@@ -11,16 +11,25 @@ class User(BaseModel):
     email: str
     username: str
     password: str
-    name: str
-    surname: str
-    # role_id: int
-    role_id: Role
+    first_name: str
+    second_name: str
+    role_id: int
+    # role_id: Role
 
 
 class UserIn(BaseModel):
     email: str
     username: str
     password: str
-    name: str
-    surname: str
+    first_name: str
+    second_name: str
     role_id: int
+
+
+class UserPatch(BaseModel):
+    email: str = None
+    username: str = None
+    password: str = None
+    first_name: str = None
+    second_name: str = None
+    role_id: int = None
