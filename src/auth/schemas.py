@@ -33,3 +33,8 @@ class UserPatch(BaseModel):
     first_name: str = None
     second_name: str = None
     role_id: int = None
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str

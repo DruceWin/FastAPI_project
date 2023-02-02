@@ -1,12 +1,13 @@
 from typing import List
 
 from fastapi import APIRouter, Depends
+from jose import jwt
 from sqlalchemy import select, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import database, get_session
 from .models import users
-from .schemas import UserIn, User, UserPatch
+from .schemas import UserIn, User, UserPatch, UserLogin
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -84,3 +85,26 @@ async def create_users(user: UserIn):
     )
     last_record_id = await database.execute(query)
     return {**user.dict(), 'id': last_record_id}
+
+secret = 'my_secret'
+
+
+@auth_router.post('/login')
+async def user_login(form_data: UserLogin, session: AsyncSession = Depends(get_session)):
+    try:
+        user = select(users).where(users.c.email == form_data.email)
+        get_user = await session.execute(user)
+        # print(get_user.fetchone().password)
+        # print(form_data.__dict__['password'])
+        # print('da' if str(form_data.password) == str(get_user.fetchone()[4]) else 'net')
+        # if str(form_data.password) == str(get_user.fetchone()[4]):
+        token = jwt.encode({'email': form_data.email, 'password': form_data.password}, secret, algorithm='HS256')
+        print()
+        return {'bearer': token}
+        # else:
+        #     return {'message': 'email or password not valid'}
+    except Exception:
+        return {'message': 'email not valid'}
+    token = jwt.encode({'email': form_data.email, 'password': form_data.password}, secret, algorithm='HS256')
+    print()
+    return {'bearer': token}
