@@ -94,17 +94,10 @@ async def user_login(form_data: UserLogin, session: AsyncSession = Depends(get_s
     try:
         user = select(users).where(users.c.email == form_data.email)
         get_user = await session.execute(user)
-        # print(get_user.fetchone().password)
-        # print(form_data.__dict__['password'])
-        # print('da' if str(form_data.password) == str(get_user.fetchone()[4]) else 'net')
-        # if str(form_data.password) == str(get_user.fetchone()[4]):
-        token = jwt.encode({'email': form_data.email, 'password': form_data.password}, secret, algorithm='HS256')
-        print()
-        return {'bearer': token}
-        # else:
-        #     return {'message': 'email or password not valid'}
+        if form_data.password == get_user.fetchone()[3]:
+            token = jwt.encode({'email': form_data.email, 'password': form_data.password}, secret, algorithm='HS256')
+            return {'bearer': token}
+        else:
+            return {'message': 'email or password not valid'}
     except Exception:
-        return {'message': 'email not valid'}
-    token = jwt.encode({'email': form_data.email, 'password': form_data.password}, secret, algorithm='HS256')
-    print()
-    return {'bearer': token}
+        return {'message': 'email or password not valid'}

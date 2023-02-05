@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h4>Form</h4>
+<form method="POST" id="my_form">
+    <input type="text" name="email" id="email"> <br>
+    <input type="password" name="password" id="password"> <br>
+    <input type="button" value="Send" id="send_data">
+</form>
+<script src="static/index.js"></script>
+<script>
+    let input_button = document.getElementById('send_data')
+    input_button.addEventListener('click', get_token)
+    function get_token(){
+        let my_form = document.getElementById('my_form')
+        let form_data = new FormData(my_form)
+        let payload = {
+            'email': document.getElementById('email').value,
+            'password': document.getElementById('password').value
+        }
+        console.log(payload)
+        fetch('http://127.0.0.1:8000/auth/login', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        }).then(resp => resp.json()).then(a =>{
+            document.cookie = `bearer = ${a.bearer}`
+            localStorage.setItem('bearer', a.bearer)
+            if (a.bearer) {
+                window.location.replace("http://127.0.0.1:8000/user_page")
+            }
+            console.log(a)
+        })
+    }
+</script>
+</body>
+</html>
