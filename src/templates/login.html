@@ -6,10 +6,11 @@
 </head>
 <body>
 <h4>Form</h4>
-<form method="POST" id="my_form">
+<form method="POST" id="my_form" action="http://127.0.0.1:8000/auth/login">
     <input type="text" name="email" id="email"> <br>
     <input type="password" name="password" id="password"> <br>
-    <input type="button" value="Send" id="send_data">
+    <button>OK</button>
+<!--    <input type="button" value="Send" id="send_data">-->
 </form>
 <script src="static/index.js"></script>
 <script>
@@ -30,11 +31,16 @@
             },
             body: JSON.stringify(payload)
         }).then(resp => resp.json()).then(a =>{
-            document.cookie = `bearer = ${a.bearer}`
-            localStorage.setItem('bearer', a.bearer)
-            if (a.bearer) {
-                window.location.replace("http://127.0.0.1:8000/user_page")
-            }
+            // document.cookie = `bearer = ${a.bearer}`
+            // добавление в куки
+
+            // localStorage.setItem('bearer', a.bearer)
+            // добавление в локал сторадж
+
+            // if (a.bearer) {
+            //     window.location.replace("http://127.0.0.1:8000/user_page")
+            // }
+            // проверка наличия и переход на другой урл
             console.log(a)
         })
     }

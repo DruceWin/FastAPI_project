@@ -1,11 +1,13 @@
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Form
 from jose import jwt
 from sqlalchemy import select, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import database, get_session
+from starlette.responses import RedirectResponse, Response
+
 from .models import users
 from .schemas import UserIn, User, UserPatch, UserLogin
 
@@ -90,12 +92,19 @@ secret = 'my_secret'
 
 
 @auth_router.post('/login')
-async def user_login(form_data: UserLogin, session: AsyncSession = Depends(get_session)):
+async def user_login(
+        form_data: UserLogin,
+        # email: str = Form(),
+        # password: str = Form(),
+        session: AsyncSession = Depends(get_session)):
     try:
         user = select(users).where(users.c.email == form_data.email)
+        # user = select(users).where(users.c.email == email)
         get_user = await session.execute(user)
         if form_data.password == get_user.fetchone()[3]:
+        # if password == get_user.fetchone()[3]:
             token = jwt.encode({'email': form_data.email, 'password': form_data.password}, secret, algorithm='HS256')
+            # return RedirectResponse('/user_page', status_code=301)
             return {'bearer': token}
         else:
             return {'message': 'email or password not valid'}
