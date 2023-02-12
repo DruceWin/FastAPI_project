@@ -1,11 +1,13 @@
+import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends, Form
-from jose import jwt
+from jose import jwt, ExpiredSignatureError
 from sqlalchemy import select, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import database, get_session
+from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
 
 from .models import users
@@ -103,10 +105,45 @@ async def user_login(
         get_user = await session.execute(user)
         if form_data.password == get_user.fetchone()[3]:
         # if password == get_user.fetchone()[3]:
-            token = jwt.encode({'email': form_data.email, 'password': form_data.password}, secret, algorithm='HS256')
+            access = jwt.encode({'email': form_data.email,
+                                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=1)},
+                                secret, algorithm='HS256')
+            refresh = jwt.encode({'email': form_data.email,
+                                 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)},
+                                 secret, algorithm='HS256')
             # return RedirectResponse('/user_page', status_code=301)
-            return {'bearer': token}
+            return {
+                'access': access,
+                'refresh': refresh
+                    }
         else:
             return {'message': 'email or password not valid'}
     except Exception:
         return {'message': 'email or password not valid'}
+
+
+@auth_router.get('/auth_token')
+async def toke_auth(request: Request, session: AsyncSession = Depends((get_session))):
+    try:
+        access_token = request.cookies.get('access')
+        jwt.decode(access_token, secret, algorithms=['HS256'])
+        return {'ok'}
+    except ExpiredSignatureError:
+        return {'time expired'}
+
+
+@auth_router.get('/refresh_token')
+async def toke_auth(request: Request, session: AsyncSession = Depends((get_session))):
+    try:
+        refresh_token = request.cookies.get('refresh')
+        payload = jwt.decode(refresh_token, secret, algorithms=['HS256'])
+        access = jwt.encode(payload | {'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=1)},
+                            secret, algorithm='HS256')
+        refresh = jwt.encode(payload | {'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)},
+                             secret, algorithm='HS256')
+        return {
+                'access': access,
+                'refresh': refresh
+                    }
+    except ExpiredSignatureError:
+        return {'time expired'}
