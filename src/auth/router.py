@@ -38,21 +38,24 @@ async def user_login(data: UserLogin, session: AsyncSession = Depends(get_sessio
         raise HTTPException(status_code=401, detail='Email or password not valid')
 
 
-@auth_router.get('/refresh')
-async def refresh_token(request: Request):
-    refresh_token = request.cookies.get('refresh')
-    return auth.get_new_refresh_or_401(refresh_token)
+@auth_router.post('/refresh/')
+async def refresh_token(request: Request, refresh: Token):
+    refresh_token = refresh
+
+    return auth.get_new_refresh_or_401(refresh_token.refresh)
 
 
-@auth_router.get('/authorization')
-async def authorization(request: Request):
-    print(request.cookies)
-    # access_token = request.cookies.get('access_token')
-    # print(access_token)
-    # return auth.decode_access_token(access_token)
-    return {'ok': 1}
+@auth_router.get('/get_all_users')
+async def get_all_users(request: Request, session: AsyncSession = Depends(get_session)) -> List[User]:
+    try:
+        access_token = request.headers.get('authorization')
+        if auth.decode_access_token(access_token):
+            users_query = select(users)
+            all_users = await session.execute(users_query)
+            return all_users.all()
 
-
+    except Exception:
+        raise HTTPException(status_code=401, detail='authorization data not provided')
 
 
 # starii code
